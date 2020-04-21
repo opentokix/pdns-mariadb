@@ -17,7 +17,8 @@ services:
       - ALLOW_EMPTY_PASSWORD=yes
       - MARIADB_ROOT_PASSWORD=06B3HxRivdhp
       - BITNAMI_DEBUG=true
-      - MARIADB_EXTRA_FLAGS=--max-connect-errors=1000 --max_connections=512
+      - MARIADB_EXTRA_FLAGS=--max-connect-errors=1000 --max_connections=512Tel
+      
     networks:
       - pdns
 
