@@ -1,0 +1,48 @@
+---
+version: '3.5'
+services:
+  mariadb-master:
+    image: 'bitnami/mariadb:10.4.12'
+    ports:
+      - '3306'
+    volumes:
+      - 'mariadb_master_data:/bitnami/mariadb'
+    environment:
+      - MARIADB_REPLICATION_MODE=master
+      - MARIADB_REPLICATION_USER=repl_user
+      - MARIADB_USER=pdns
+      - MARIADB_PASSWORD=P2RNxOUz
+      - MARIADB_DATABASE=pdns
+      # ALLOW_EMPTY_PASSWORD is recommended only for development.
+      - ALLOW_EMPTY_PASSWORD=yes
+      - MARIADB_ROOT_PASSWORD=06B3HxRivdhp
+      - BITNAMI_DEBUG=true
+      - MARIADB_EXTRA_FLAGS=--max-connect-errors=1000 --max_connections=512
+    networks:
+      - pdns
+
+
+  powerdns1:
+    image: 'psitrax/powerdns:v4.2'
+    ports:
+      - '5301'
+      - '5301/udp'
+    depends_on:
+      - mariadb-master
+    environment:
+      - MYSQL_USER=pdns
+      - MYSQL_DB=pdns
+      - MYSQL_PASS=P2RNxOUz
+      - MYSQL_HOST=mariadb-master
+    command: "--webserver=yes --webserver-address=0.0.0.0 --webserver-allow-from=0.0.0.0/0 --webserver-loglevel=normal --api=yes --api-key=foobar --gmysql-user=pdns --gmysql-dbname=pdns --gmysql-host=mariadb-master --gmysql-password=P2RNxOUz"
+    networks:
+      - pdns    
+  
+
+networks:
+  pdns:
+
+volumes:
+  mariadb_master_data:
+    driver: local 
+  
