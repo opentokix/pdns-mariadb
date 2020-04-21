@@ -45,7 +45,7 @@ def add_rand_zone(api):
     log.error("Error in api connection")
     log.error(sys.exc_info()[0])
 
-  log.info(str(zone) + "," + str(zone.details))
+  log.info(f"{zone},{str(zone.details)}")
 
 def main():
   PDNS_API = "http://172.20.0.4:8081/api/v1"
@@ -56,7 +56,7 @@ def main():
 
   for i in range(20):
     threads = []
-    for t in range(20):
+    for t in range(5):
       t = threading.Thread(target=add_rand_zone, args=(api,))
       threads.append(t)
       t.start()
