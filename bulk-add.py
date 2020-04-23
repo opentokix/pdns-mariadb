@@ -4,10 +4,11 @@ import powerdns
 import logging 
 import random
 import string
-import threading
 from datetime import date
 from time import sleep
 import sys
+import concurrent.futures 
+
 
 log = logging.getLogger("bulkzones")
 log.setLevel(logging.INFO)
@@ -53,14 +54,9 @@ def main():
 
   api_client = powerdns.PDNSApiClient(api_endpoint=PDNS_API, api_key=PDNS_KEY)
   api = powerdns.PDNSEndpoint(api_client)
-
-  for i in range(20):
-    threads = []
-    for t in range(5):
-      t = threading.Thread(target=add_rand_zone, args=(api,))
-      threads.append(t)
-      t.start()
-    sleep(0.5)
+  with concurrent.futures.ThreadPoolExecutor(max_workers=200) as executor:
+    for num in range(10000):
+      executor.submit(add_rand_zone, api)
 
 if __name__ == "__main__":
     main()
