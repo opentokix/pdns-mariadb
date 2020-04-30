@@ -8,6 +8,7 @@ from datetime import date
 from time import sleep
 import sys
 import concurrent.futures 
+import click
 
 
 log = logging.getLogger("bulkzones")
@@ -22,6 +23,13 @@ log.addHandler(fh)
 log.addHandler(ch)
 log.info("START:")
 log.error("Starting bulk add of zones.")
+
+def rand_ipv4():
+  first = random.randint(1, 255)
+  second = random.randint(0, 255)
+  third = random.randint(0, 255)
+  fourth = random.randint(0, 255)
+  return f"{first}.{second}.{third}.{fourth}"
 
 def rand_string(num=8):
   letters = string.ascii_lowercase
@@ -48,15 +56,18 @@ def add_rand_zone(api):
 
   log.info(f"{zone},{str(zone.details)}")
 
-def main():
+@click.command()
+@click.option('--num', '-n', 'numzones', required=True, help="number of random zones to add", type=int)
+@click.option('--workers', '-w', 'numworkers', required=False, help="Number of workers", show_default=True, default=4, type=int)
+def main(numzones, numworkers):
   PDNS_API = "http://172.20.0.4:8081/api/v1"
   PDNS_KEY = "foobar"
 
   api_client = powerdns.PDNSApiClient(api_endpoint=PDNS_API, api_key=PDNS_KEY)
   api = powerdns.PDNSEndpoint(api_client)
-  with concurrent.futures.ThreadPoolExecutor(max_workers=200) as executor:
-    for num in range(10000):
+  with concurrent.futures.ThreadPoolExecutor(max_workers=numworkers) as executor:
+    for i in range(numzones):
       executor.submit(add_rand_zone, api)
 
 if __name__ == "__main__":
-    main()
+  main()
